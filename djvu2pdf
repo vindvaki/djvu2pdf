@@ -1,0 +1,75 @@
+#!/bin/bash
+
+
+#
+# Set up paths
+# 
+
+initial_directory=$(pwd)
+file_in=$(readlink -f "$1")
+file_out=$(readlink -f "$2")
+file_out_basename=$(basename "$file_out")
+
+#
+# Set up the temporary storage
+# 
+
+tmpdir=$(mktemp -d)
+cd $tmpdir
+
+function cleanup() 
+{
+    rm -rf $tmpdir
+    cd $initial_directory
+}
+trap "cleanup" EXIT # makes sure we clean up after ourselves
+
+#
+# Extract raw pages and text
+#
+
+ddjvu -format=tiff -eachpage "$file_in" pg%d.tiff
+num_pages=$(djvused -e 'n' "$file_in")
+
+for i in $(seq -w 1 "$num_pages"); do
+    
+    # Pad numbers with leading zeros, if they are shorter than the
+    # longest number, in order to get the correct ordering of pages
+    # from `pdfbeads`.
+
+    j=$(echo $i | sed 's/^0*//')
+
+    if [ "$i" != "$j" ]; then
+        mv -n pg$j.tiff pg$i.tiff
+    fi
+
+    # OCR content needs to have one html file per page for `pdfbeads`;
+    # `djvu2hocr` is capable of extracting it all at once, but then it
+    # goes into one big file which we would need to split afterwards,
+    # this would require html parsing, which is just too much.  The
+    # s/ocrx/ocr/g substitution is a small hack to make `pdfbeads`
+    # understand the output from `djvu2hocr`.
+
+    djvu2hocr "$file_in" -p $i | sed 's/ocrx/ocr/g' > pg$i.html
+done
+
+
+#
+# Generate the TOC
+#
+
+djvused -e 'print-outline' "$file_in" > toc.txt
+
+# The output returned by `djvused` has an s-expression like
+# tree structure, which is incompatible with the indentation based
+# structure used by `pdfbeads`
+
+djvu2pdf_toc_parser.py < toc.txt > toc.out.txt
+
+
+#
+# Generate the final PDF
+#
+
+pdfbeads --toc toc.out.txt -o output.pdf
+mv output.pdf "$file_out"
