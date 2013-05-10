@@ -2,7 +2,7 @@
 
 import sys
 
-def parse_sexp(toc_input, indent_str, i):
+def parse_sexp(toc_input, toc_output, indent_str, i):
     """
     Translate TOC in the s-exp format output by ``djvused`` to a
     format understood by ``pdfbeads``. 
@@ -28,9 +28,9 @@ def parse_sexp(toc_input, indent_str, i):
             # want in our output
             page = page[0]+page[2:] 
             
-            print("{0}{1} {2}".format(indent_str, title, page))
+            toc_output += ["{0}{1} {2}".format(indent_str, title, page)]
             
-            i = parse_sexp(toc_input, indent_str+'\t', i)
+            i = parse_sexp(toc_input, toc_output, indent_str+'\t', i)
 
         elif toc_input[i] == ')':
             return i+1
@@ -80,4 +80,4 @@ if __name__ == '__main__':
     if len(toc_input) > 0:
         # We must skip the '(bookmarks' prefix as it doesn't fit the
         # general pattern expected by `parse_sexp`. 
-        parse_sexp(toc_input[1:], '', 0) 
+        parse_sexp(toc_input[1:], [], '', 0) 
