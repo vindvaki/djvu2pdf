@@ -80,4 +80,6 @@ if __name__ == '__main__':
     if len(toc_input) > 0:
         # We must skip the '(bookmarks' prefix as it doesn't fit the
         # general pattern expected by `parse_sexp`. 
-        parse_sexp(toc_input[1:], [], '', 0) 
+        toc_output = []
+        parse_sexp(toc_input[1:], toc_output, '', 0) 
+        print('\n'.join(toc_output))
