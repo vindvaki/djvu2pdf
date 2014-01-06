@@ -28,20 +28,16 @@ trap "cleanup" EXIT # makes sure we clean up after ourselves
 # Extract raw pages and text
 #
 
-ddjvu -format=tiff -eachpage "$file_in" pg%d.tiff
+ddjvu -format=tiff "$file_in" tmp_multipage.tiff
+tiffsplit tmp_multipage.tiff tmp_page_
+rm tmp_multipage.tiff
 num_pages=$(djvused -e 'n' "$file_in")
-
-for i in $(seq -w 1 "$num_pages"); do
-    
-    # Pad numbers with leading zeros, if they are shorter than the
-    # longest number, in order to get the correct ordering of pages
-    # from `pdfbeads`.
-
-    j=$(echo $i | sed 's/^0*//')
-
-    if [ "$i" != "$j" ]; then
-        mv -n pg$j.tiff pg$i.tiff
-    fi
+strlen_num_pages="${#num_pages}"
+i=0
+for page_alpha in tmp_page_*; do
+    i=$[i+1]
+    j=$(printf "%0${strlen_num_pages}d" $i)
+    mv $page_alpha tmp_page_${j}.tiff
 
     # OCR content needs to have one html file per page for `pdfbeads`;
     # `djvu2hocr` is capable of extracting it all at once, but then it
@@ -50,7 +46,7 @@ for i in $(seq -w 1 "$num_pages"); do
     # s/ocrx/ocr/g substitution is a small hack to make `pdfbeads`
     # understand the output from `djvu2hocr`.
 
-    djvu2hocr "$file_in" -p $i | sed 's/ocrx/ocr/g' > pg$i.html
+    djvu2hocr "$file_in" -p $i | sed 's/ocrx/ocr/g' > tmp_page_${j}.html
 done
 
 
