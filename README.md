@@ -14,15 +14,12 @@ is no embedded text.
 
 # (nontrivial) Dependencies
 
-- [`djvused`][1]: To extract metadata like the TOC and the number of pages.
-- [`ddjvu`][1]: To split the djvu file into tiff pages.
-- [`djvu2hocr`](http://jwilk.net/software/ocrodjvu): To extract the OCR layers for [`pdfbeads`][2].
-- [`pdfbeads`][2]: To combine TIFF images and OCR content into a highly
+- [`djvused`](http://djvu.sourceforge.net/): To extract metadata like the TOC and the number of pages.
+- [`ddjvu`](http://djvu.sourceforge.net/): To split the djvu file into tiff pages.
+- [`djvu2hocr`](http://jwilk.net/software/ocrodjvu): To extract the OCR layers for `pdfbeads`.
+- [`pdfbeads`](http://rubygems.org/gems/pdfbeads): To combine TIFF images and OCR content into a highly
   compressed pdf file.
 - `djvu2pdf_toc_parser.py`: A python script to convert the TOC for `pdfbeads`.
-
-[1](http://djvu.sourceforge.net/)
-[2](http://rubygems.org/gems/pdfbeads)
 
 # TODO
 
