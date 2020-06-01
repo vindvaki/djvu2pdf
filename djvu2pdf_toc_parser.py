@@ -2,6 +2,7 @@
 
 import sys
 
+
 def parse_sexp(toc_input, toc_output, indent_str, i):
     """
     Translate TOC in the s-exp format output by ``djvused`` to a
@@ -21,21 +22,22 @@ def parse_sexp(toc_input, toc_output, indent_str, i):
         if toc_input[i] == '(':
             i += 1
             i, title = next_quote(toc_input, i)
-            i, page  = next_quote(toc_input, i)
+            i, page = next_quote(toc_input, i)
 
             # `djvused` outputs page numbers prefixed with '#' (the
             # second character of the `page` variable) which we don't
             # want in our output
-            page = page[0]+page[2:]
+            page = page[0] + page[2:]
 
             toc_output += ["{0}{1} {2}".format(indent_str, title, page)]
 
-            i = parse_sexp(toc_input, toc_output, indent_str+'\t', i)
+            i = parse_sexp(toc_input, toc_output, indent_str + '\t', i)
 
         elif toc_input[i] == ')':
-            return i+1
+            return i + 1
 
         i += 1
+
 
 def next_quote(str, i):
     """
@@ -60,7 +62,7 @@ def next_quote(str, i):
     # every escaped double quote inside the literal with a single quote.
     while True:
         if str[j] == '"':
-            if str[j-1] == "\\":
+            if str[j - 1] == "\\":
                 output.pop()
                 output += ["'"]
             else:
@@ -70,7 +72,8 @@ def next_quote(str, i):
             output += [str[j]]
         j += 1
 
-    return j+1, ''.join(output)
+    return j + 1, ''.join(output)
+
 
 if __name__ == '__main__':
     toc_input = sys.stdin.read()
