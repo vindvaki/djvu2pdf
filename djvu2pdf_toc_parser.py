@@ -39,18 +39,18 @@ def parse_sexp(toc_input, toc_output, indent_str, i):
         i += 1
 
 
-def next_quote(str, i):
+def next_quote(string, i):
     """
-    Finds the next substring ``str[k:j]`` of ``str[i:]`` enclosed by
+    Finds the next substring ``string[k:j]`` of ``string[i:]`` enclosed by
     non-escaped double-quotes and returns the tuple ``j, res`` where
-    ``res`` is ``str[k:j]`` with escaped double-quotes replaced by
+    ``res`` is ``string[k:j]`` with escaped double-quotes replaced by
     single-quotes.
     """
 
     # Find the opening quote. This is simple because we can safely
     # assume there is only whitespace in between
     j = i
-    while str[j] != '"':
+    while string[j] != '"':
         j += 1
     i = j
     j += 1
@@ -61,15 +61,15 @@ def next_quote(str, i):
     # cannot handle correctly. To circumvent this bug, we replace
     # every escaped double quote inside the literal with a single quote.
     while True:
-        if str[j] == '"':
-            if str[j - 1] == "\\":
+        if string[j] == '"':
+            if string[j - 1] == "\\":
                 output.pop()
                 output += ["'"]
             else:
-                output += [str[j]]
+                output += [string[j]]
                 break
         else:
-            output += [str[j]]
+            output += [string[j]]
         j += 1
 
     return j + 1, ''.join(output)
