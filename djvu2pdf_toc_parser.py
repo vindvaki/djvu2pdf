@@ -64,12 +64,12 @@ def next_quote(string, i):
         if string[j] == '"':
             if string[j - 1] == "\\":
                 output.pop()
-                output += ["'"]
+                output.append("'")
             else:
-                output += [string[j]]
+                output.append(string[j])
                 break
         else:
-            output += [string[j]]
+            output.append(string[j])
         j += 1
 
     return j + 1, ''.join(output)
