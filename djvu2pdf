@@ -14,12 +14,12 @@ file_out=$(readlink -f "$2")
 # 
 
 tmpdir=$(mktemp -d)
-cd $tmpdir
+cd "$tmpdir" || exit 0
 
 function cleanup() 
 {
-    rm -rf $tmpdir
-    cd $initial_directory
+    rm -rf "$tmpdir"
+    cd "$initial_directory" || exit 0
 }
 trap "cleanup" EXIT # makes sure we clean up after ourselves
 
@@ -39,8 +39,8 @@ echo "    **** Processing $num_pages pages"
 # s/ocrx/ocr/g substitution is a small hack to make `pdfbeads`
 # understand the output from `djvu2hocr`.
 
-for i in $(seq -f "%04.0f" 1 $num_pages); do
-    djvu2hocr "$1" -p $i | sed 's/ocrx/ocr/g' > tmp_page_${i}.html
+for i in $(seq -f "%04.0f" 1 "$num_pages"); do
+    djvu2hocr "$1" -p "$i" | sed 's/ocrx/ocr/g' > tmp_page_"${i}".html
 done
 
 #
