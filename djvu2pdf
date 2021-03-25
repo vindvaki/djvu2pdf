@@ -8,7 +8,6 @@
 initial_directory=$(pwd)
 file_in=$(readlink -f "$1")
 file_out=$(readlink -f "$2")
-file_out_basename=$(basename "$file_out")
 
 #
 # Set up the temporary storage
@@ -28,27 +27,21 @@ trap "cleanup" EXIT # makes sure we clean up after ourselves
 # Extract raw pages and text
 #
 
-ddjvu -format=tiff "$file_in" tmp_multipage.tiff
-tiffsplit tmp_multipage.tiff tmp_page_
-rm tmp_multipage.tiff
+ddjvu -verbose -eachpage -format=tiff "$file_in" tmp_page_%04d.tiff
 num_pages=$(djvused -e 'n' "$file_in")
-strlen_num_pages="${#num_pages}"
-i=0
-for page_alpha in tmp_page_*; do
-    i=$[i+1]
-    j=$(printf "%0${strlen_num_pages}d" $i)
-    mv $page_alpha tmp_page_${j}.tiff
 
-    # OCR content needs to have one html file per page for `pdfbeads`;
-    # `djvu2hocr` is capable of extracting it all at once, but then it
-    # goes into one big file which we would need to split afterwards,
-    # this would require html parsing, which is just too much.  The
-    # s/ocrx/ocr/g substitution is a small hack to make `pdfbeads`
-    # understand the output from `djvu2hocr`.
+echo "    **** Processing $num_pages pages"
 
-    djvu2hocr "$file_in" -p $i | sed 's/ocrx/ocr/g' > tmp_page_${j}.html
+# OCR content needs to have one html file per page for `pdfbeads`;
+# `djvu2hocr` is capable of extracting it all at once, but then it
+# goes into one big file which we would need to split afterwards,
+# this would require html parsing, which is just too much.  The
+# s/ocrx/ocr/g substitution is a small hack to make `pdfbeads`
+# understand the output from `djvu2hocr`.
+
+for i in $(seq -f "%04.0f" 1 $num_pages); do
+    djvu2hocr "$1" -p $i | sed 's/ocrx/ocr/g' > tmp_page_${i}.html
 done
-
 
 #
 # Generate the TOC
