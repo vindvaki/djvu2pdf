@@ -53,7 +53,7 @@ djvused -e 'print-outline' "$file_in" > toc.txt
 # tree structure, which is incompatible with the indentation based
 # structure used by `pdfbeads`
 
-djvu2pdf_toc_parser.py < toc.txt > toc.out.txt
+"$initial_directory"/djvu2pdf_toc_parser.py < toc.txt > toc.out.txt
 
 
 #
