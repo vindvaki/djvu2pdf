@@ -16,6 +16,8 @@ file_out=$(readlink -f "$2")
 tmpdir=$(mktemp -d)
 cd "$tmpdir" || exit 0
 
+echo "Using $tmpdir for temporary files."
+
 function cleanup() 
 {
     rm -rf "$tmpdir"
@@ -47,12 +49,14 @@ done
 # Generate the TOC
 #
 
+echo "Extracting the TOC."
 djvused -e 'print-outline' "$file_in" > toc.txt
 
 # The output returned by `djvused` has an s-expression like
 # tree structure, which is incompatible with the indentation based
 # structure used by `pdfbeads`
 
+echo "Converting the TOC for PDFBeams."
 "$initial_directory"/djvu2pdf_toc_parser.py < toc.txt > toc.out.txt
 
 
